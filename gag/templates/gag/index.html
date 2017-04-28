@@ -1,0 +1,429 @@
+{% extends "gag/base.html" %}
+
+{% block title %}
+
+GAG   
+{% endblock title %}
+
+
+
+
+
+
+    {% block style %}
+        <style type="text/css">
+
+  html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
+
+.wrapper{
+    display:table;
+    width:auto;
+    position:relative;
+    width:50%;
+}
+.playpause {
+    background-image:url(http://www.imagicle.com/Portals/2/Images/Imagicle/Icons/play-circle.png);
+    background-repeat:no-repeat;
+    width:50%;
+    height:50%;
+    position:absolute;
+    left:0%;
+    right:0%;
+    top:0%;
+    bottom:0%;
+    margin:auto;
+    background-size:contain;
+    
+}
+        </style>
+    {% endblock style %}
+
+
+{% block body %}
+<body class="w3-theme-l5">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+{% if 0 %}
+    {% for account in user.socialaccount_set.all %}
+        <h2 style="text-transform:capitalize;">{{ account.provider }} account data</h2>
+        <p><img width="50" height="50" src="{{ account.get_avatar_url }}" /></p>
+        <p>UID: <a href="{{account.extra_data.link }}">{{ account.uid }}</a></p>
+        <p>Username: {{ account.extra_data.username }}</p>
+        <p>First Name: {{ account.extra_data.first_name }}</p>
+        <p>Last Name: {{ account.extra_data.last_name }}</p>
+        <p>Profile Link: <a href="{{ account.extra_data.link    }}">{{ account.extra_data.link }}</a></p>
+    {% endfor %}
+{% endif %}
+{% load account %}
+
+
+<br>
+{% if  data %}
+    
+
+{% for content in data  reversed%}
+    <br>
+    <div style="margin-left:10%;margin-right: 10%;">
+    
+    <br>
+       <div class="container col-md-offset-2 col-md-8 " style=" margin-bottom: 10px;">
+      <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
+        
+            <img src="{{content.user_pic}}" alt="Avatar" class="w3-left w3-circle w3-margin-right" width="72" height="72">
+        
+            
+        
+        <span class="w3-right w3-opacity">{{ content.upload_date|timesince}} ago</span>
+        <h4>{{ content.firstname}}</h4><br>
+        <hr class="w3-clear">
+        <p>{{content.description}}</p>
+          <div class="w3-row-padding" style="margin:0 -16px">
+            <div >
+                 {% ifequal content.file_format "mp4"%}
+        
+   
+        
+     <div >
+    <video class="video" style="width:100%;" >
+        <source src="{{content.media.url}}"  class="w3-margin-bottom"type="video/mp4">
+    </video>
+     <div class="playpause"></div>
+</div>
+    {% else %}
+        
+    <img src="{{content.media.url}}" class="w3-margin-bottom img-responsive" >
+    <br>
+     {% endifequal %}
+              </div>
+            
+        </div>
+
+
+
+
+    
+ <span>
+   
+      {% if  user.id %}
+          
+       
+      {% csrf_token %}
+    
+            {% if  content.id in liked %}
+                
+            <button type="submit" name="post" id="like_count{{forloop.counter}}"value="{{content.id}}"class="w3-button btn btn-primary w3-theme-d1 w3-margin-bottom dislike" >
+       
+          <i class="fa fa-thumbs-up"></i>Liked <span class="badge" id="like_count{{forloop.counter}}count">{{content.like}}</span>
+          </button>
+          {% else %} 
+           <button type="submit"  name="post" id="like_count{{forloop.counter}}count" value="{{content.id}}"class="w3-button btn btn-primary w3-theme-d1 w3-margin-bottom like" >
+       
+          <i class="fa fa-thumbs-up"></i>Like <span class="badge" id="like_count{{forloop.counter}}count">{{content.like}}</span>
+          </button> 
+     {% endif %}
+{% else %}
+    
+
+     <button data-toggle="modal" data-target="#login-modal" class="btn btn-primary w3-button w3-theme-d1 w3-margin-bottom like_login" >
+       
+          <i class="fa fa-thumbs-up"></i>Like <span class="badge" id="like_count{{forloop.counter}}count">{{content.like}}</span></button>
+       {% endif %}
+
+
+
+    
+
+    
+        <button type="button" class=" btn btn-primary w3-button w3-theme-d2 w3-margin-bottom comment" value="{{ content.id }}"><i class="fa fa-comment" ></i>  Comment</button>
+      </span>
+        <div id="comment_list{{ content.id }}" class="nothing">
+
+        </div>
+
+          <div id="show_all_comments{{ content.id }}"></div>
+
+        <form id='comment_form{{ content.id }}' action='' enctype='multipart/form-data' class='comment_submit_form' method='post' style='display:none;'>
+                {% if user.id %}
+                      <textarea id="comment_text" placeholder="Write your comment here..." class="user_loggeg_in form-control" required="required" style="resize: none;"></textarea>
+                      <input type='submit'  style="float: right; margin: 5px; margin-right: 0;"value='Post' class="btn btn-primary w3-button w3-theme-d2">
+                {% else %}
+                      <textarea id="comment_text" class="user_not_logged_in form-control" style="resize: none;"></textarea>
+                    <input type='submit' value='Post'  style="float: right; margin: 5px; margin-right: 0;"value='Post' class="btn btn-primary w3-button w3-theme-d2"  data-toggle="modal" data-target="#login-modal">
+                {% endif %}
+                <input id='post_id' value='{{ content.id }}' hidden>
+
+            </form>
+  </div>
+    
+    
+   
+</div>
+
+</div>
+
+
+{% endfor %}
+{% else %}
+    <p>No Post</p>
+ {% endif %}   
+    
+
+
+
+
+
+
+
+
+      
+
+
+
+
+
+
+
+
+      
+
+
+    
+    
+
+
+ 
+<script>
+// Accordion
+function myFunction(id) {
+    var x = document.getElementById(id);
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+        x.previousElementSibling.className += " w3-theme-d1";
+    } else { 
+        x.className = x.className.replace("w3-show", "");
+        x.previousElementSibling.className = 
+        x.previousElementSibling.className.replace(" w3-theme-d1", "");
+    }
+}
+
+// Used to toggle the menu on smaller screens when clicking on the menu button
+function openNav() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else { 
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% block javascript %}
+<script>
+
+$("[id^='comment_text']").focus(
+    function () {
+        if($(this).hasClass("user_not_logged_in")) {
+            $("#login-modal").modal('show');
+        }
+    }
+);
+
+$("button.comment").click(
+    function (event) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+
+        var post_id =$(this).val();
+        var comment_list = $("#comment_list"+post_id);
+
+        if(comment_list.hasClass("nothing")) {
+            $.ajax({
+                url: '/gag/showcomment',
+                dataType: 'json',
+                data: {
+                    post_id: post_id
+                },
+                success: function (data) {
+                    var x = data.all_cmnts;
+
+                    for (var i = 0; i < x.length; i++) {
+                        comment_list.append("<div class='comment_msg'> <b><i style='color:#4d636f;'>" + x[i]["username"] + "</i></b> <span class='w3-right w3-opacity'>"+x[i]["comment_time"]+" ago</span><br>  " + x[i]["comment"] + "</div>");
+                    }
+
+                    $("#comment_form"+post_id).css("display","block");
+                    comment_list.attr('class', 'comments_present');
+
+                    var totalcmnts = data.total_cmnts;
+                    var show_all_comments = $("#show_all_comments"+post_id);
+
+                    if(totalcmnts==0){
+                        comment_list.append("<div class='comment_msg'>No comments.. be first to comment</div>");
+                        comment_list.attr('class', 'first_comment_class');
+                    }
+                    else if(totalcmnts>2){
+                        show_all_comments.html("<a href='/gag/"+post_id+"#comment_list' target='_blank' >See all comments (<span id='totalcmnts"+post_id+"'>"+totalcmnts+"</span> comments)</a>");
+                    }
+                },
+                error: function () {
+                    alert("Cannot connect to db");
+                }
+            });
+        }
+        else{
+            comment_list.html("");
+            comment_list.attr('class', 'nothing');
+            $("#comment_form"+post_id).css("display","none");
+            $("#show_all_comments"+post_id).html("");
+        }
+
+    }
+);
+
+$("form.comment_submit_form").submit(
+      function(event){
+          event.preventDefault();
+          event.stopImmediatePropagation();
+
+          var comment_text = $(this).find("#comment_text");
+          var cmnt = comment_text.val();
+          var post_id = $(this).find("#post_id").val();
+          var comment_list = $("#comment_list"+post_id);
+
+          $.ajax({
+                url: '/gag/postcomment',
+                dataType:'json',
+                data:{
+                    post_id: post_id,
+                    cmnt: cmnt
+                },
+                success: function (data) {
+                    if(data.is_done){
+                        comment_text.val("");
+                        if(comment_list.hasClass("first_comment_class")){
+                            comment_list.html("");
+                            comment_list.attr('class', 'comments_present');
+                        }
+                        comment_list.append("<div class='comment_msg'> <b><i style='color:#4d636f;'>{{user.username}}</i></b> <span class='w3-right w3-opacity'>"+data.time+" ago</span><br>" + cmnt + "</div>");
+
+                        var totalcmnts = $("#totalcmnts"+post_id);
+                        var totalcmntsnum = totalcmnts.html();
+
+                        if(totalcmntsnum != ""){
+                            totalcmntsnum = parseInt(totalcmntsnum)+1;
+                            totalcmnts.html(totalcmntsnum);
+                        }
+                    }
+                }
+          });
+
+
+      }
+
+  );
+
+
+
+
+$(document).on('click', "button.like_login", function(event)
+{
+
+ var c=$(this).val();
+var id=$(this).attr('id');
+ 
+$(this).removeClass("like");
+$(this).addClass("dislike");
+    event.preventDefault();
+  event.stopImmediatePropagation();
+
+});
+
+$(document).on('click', "button.like", function(event) 
+{
+
+
+ var c=$(this).val();
+var id=$(this).attr('id');
+   $(this).html('<i class="fa fa-thumbs-up"></i>Liked <span class="badge" id="'+id+'count"> {{content.like}}</span>');
+$(this).removeClass("like");
+$(this).addClass("dislike");
+    event.preventDefault();
+  event.stopImmediatePropagation();
+  
+      $.ajax({
+        url: '/gag/like/',
+        type : "GET",
+        data: {
+          post: c
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_done) {
+            
+            $('#'+id+'count').html(data.is_done);
+            
+            
+          }
+        }
+      });
+
+
+});
+
+
+
+$(document).on('click', "button.dislike", function(event) 
+{
+
+
+ var c=$(this).val();
+var id=$(this).attr('id');
+   $(this).html('<i class="fa fa-thumbs-up"></i>Like <span class="badge" id="'+id+'count"> {{content.like}}</span>');
+$(this).removeClass("dislike");
+$(this).addClass("like");
+    event.preventDefault();
+  event.stopImmediatePropagation();
+  
+      $.ajax({
+        url: '/gag/dislike/',
+        type : "GET",
+        data: {
+          post: c
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_done) {
+            
+            $('#'+id+'count').html(data.is_done);
+            
+            
+           
+            
+          }
+        }
+      });
+
+
+});
+  </script>
+{% endblock %}
+
+
+
+
+
+{% endblock body %}

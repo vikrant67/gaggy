@@ -1,0 +1,40 @@
+{% extends "gag/base.html" %}
+
+{% block title %}
+
+Upload   
+{% endblock title %}
+
+{% block body %}
+
+ <div class="container">
+ <form   action="{% url 'gag:upload' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                      <br>
+                <div id="div-login-msg">
+                                <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
+                                <span id="text-login-msg">upload</span>
+                            </div>
+                            <div> 
+                                {{error}}<br>
+                            </div>
+ {% for field in form %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <span class="text-danger small">{{ field.errors }}</span>
+        </div>
+        <label class="control-label col-sm-2" >{{ field.label_tag }}</label>
+        <div class="col-sm-10">{{ field }}</div>
+    </div>
+{% endfor %}
+
+                                <button type="submit" onclick="this.disabled=true,this.form.submit();" class="btn btn-primary btn-lg btn-block">Upload</button>
+                            </div>
+                  <div>
+                                
+                            </div>
+                </div>
+                    </form>
+                    </div>
+{% endblock body %}

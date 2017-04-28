@@ -1,0 +1,236 @@
+<!-- load path to static files -->
+
+{% load staticfiles %}
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Satisfy' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="{% static 'gag/style.css' %}"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    {% block script %}
+        
+    {% endblock script %}
+    {% block style %}
+        
+    {% endblock style %}
+    <title> 
+      {% block title %}
+        gag
+    {% endblock title %} </title>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+
+        <!-- Header -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'gag:index' %}">gag</a>
+        </div>
+
+        <!-- Items -->
+        <div class="collapse navbar-collapse" id="topNavBar">
+            
+           
+             <ul class="nav navbar-nav navbar-right">
+
+                 
+                 {% if user.is_authenticated %}
+                <li style="text-transform: uppercase;"> <a class="page-scroll" href="{% url 'gag:index' %}">
+
+               {% if user %}
+    
+    {% for account in user.socialaccount_set.all %}
+        <img width="30" height="30"  src="{{ account.get_avatar_url }}" />
+        
+    {% endfor %}
+
+
+
+     {% endif %}  {{user.first_name}}</a></li>
+                    <li><a class="page-scroll" href="{% url 'gag:upload' %}"><span class="glyphicon glyphicon-plus"></span> Upload</a></li>
+                     <li><a class="page-scroll" href="{% url 'gag:logout_user' %}"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+                 {% else %}
+                 <li><a class="page-scroll" href="{% url 'gag:register' %}"><span class="glyphicon glyphicon-pencil"></span> Register</a></li>
+                      <li><a class="page-scroll" data-toggle="modal" data-target="#login-modal"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                
+                 {% endif %}
+         
+                
+               
+            </ul>
+        </div>
+
+    </div>
+</nav>
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+      <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" align="center">
+         
+
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+          </button>
+           <h2>Login</h2>
+        </div>
+
+    <div class="main">
+
+     
+      <div class="row">
+        <div class="col-xs-6 col-sm-6 col-md-6">
+          <a href="/accounts/facebook/login/?process=login" class="btn btn-lg btn-primary btn-block">Facebook</a>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-6">
+          <a href="/accounts/google/login/?process=login" class="google btn btn-lg  btn-block">Google</a>
+        </div>
+      </div>
+      <div class="login-or">
+        <hr class="hr-or">
+        <span class="span-or">or</span>
+      </div>
+                 <div id="div-forms">
+               <div id="login_msg"></div>
+                    <!-- Begin # Login Form -->
+                    <form id="login-form" class="abc" action="" >
+                    {% csrf_token %}
+            
+
+      
+        <div class="form-group">
+          <label for="inputUsernameEmail">Username </label>
+           <input id="login_username" class="form-control" type="text" name="username" placeholder="Username" required>
+        </div>
+        <div class="form-group">
+          <a class="pull-right" href="#">Forgot password?</a>
+          <label for="inputPassword">Password</label>
+          
+                <input id="login_password" class="form-control" type="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="checkbox pull-right">
+          <label>
+            <input type="checkbox">
+            Remember me </label>
+        </div>
+        <button type="submit" id="login_button" class="btn btn btn-primary">
+          Log In
+        </button>
+     
+                    </form>
+</div>
+    </div>
+    
+
+
+
+   
+                <!-- Begin # DIV Form -->
+                {% load i18n %}
+{% load account socialaccount %}
+
+{% get_providers as socialaccount_providers %}
+
+{% if socialaccount_providers %}
+
+
+
+
+{% include "socialaccount/snippets/login_extra.html" %}
+
+
+{% endif %}
+
+
+
+
+               
+                  
+                </div>
+                </div>
+                </div>
+
+<!-- Login form end -->
+
+
+
+{% block body %}
+
+
+{% endblock body %}
+<script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+<script type="text/javascript">
+$('.video').parent().click(function () {
+    if($(this).children(".video").get(0).paused){
+        $(this).children(".video").get(0).play();
+        $(this).children(".playpause").fadeOut();
+    }else{
+       $(this).children(".video").get(0).pause();
+        $(this).children(".playpause").fadeIn();
+    }
+});
+
+
+
+
+
+$(document).on('click', "#login_button", function(event) 
+{
+
+var username=$('#login_username').val();
+var password=$('#login_password').val();
+
+ 
+
+  
+    event.preventDefault();
+  event.stopImmediatePropagation();
+  
+      $.ajax({
+        url: '/gag/login/',
+        type : "GET",
+        data: {
+          username:username,
+          password:password
+         
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_login) {
+            $('#login_msg').html('<div class="alert alert-success" role="alert">Logging you in ...</div>');
+            window.setTimeout(function() {
+    $("#login_msg").fadeTo(500, 0).slideUp(500, function(){
+        $(this).remove(); 
+      
+    });
+}, 3000);
+
+            
+            window.location='/gag/';
+            
+            
+          }
+          else
+          {
+             $('#login_msg').html('<div class="alert alert-danger" role="alert">Incorrect username or password</div>');
+
+          }
+        }
+      });
+
+
+});
+
+</script>
+{% block javascript %}
+    
+{% endblock javascript %}
+</body>
+
+</htm>
